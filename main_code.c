@@ -15,7 +15,7 @@ void make_data()
     }
 }
 
-void get_arr(int bubble_arr[], int insertion_arr[], int merge_arr[])
+void get_arr(int bubble_arr[], int insertion_arr[], int merge_arr[], int quick_arr[])
 {
     freopen("input.txt","r",stdin);
 
@@ -144,7 +144,54 @@ void primary_merge_func(int merge_arr[])
 
 }
 
-void reverse_arr(int bubble_arr[], int insertion_arr[],int merge_arr[])
+int partition(int quick_arr[], int low, int high)
+{
+    int pivot = quick_arr[high];
+    int i = (low - 1);
+
+    for(int j=low; j<=high-1;j++){
+        if (quick_arr[j] <= pivot){
+            i++;
+            int temp = quick_arr[j];
+            quick_arr[j] = quick_arr[i];
+            quick_arr[i]=temp;
+        }
+    }
+
+    int temp = quick_arr[i+1];
+    quick_arr[i+1] = quick_arr[high];
+    quick_arr[high]=temp;
+    return (i+1);
+}
+
+void quick_sort(int quick_arr[], int low, int high)
+{
+    if (low < high){
+        int pivot = partition(quick_arr, low, high);
+        quick_sort(quick_arr, low, pivot-1);
+        quick_sort(quick_arr, pivot+1, high);
+    }
+}
+
+void primary_quick_func(int quick_arr[])
+{
+    if(test_case[0]=='A') freopen("quick_sort_avg.txt","a",stdout);
+    else if(test_case[0]=='B') freopen("quick_sort_best.txt","a",stdout);
+    else freopen("quick_sort__worst.txt","a",stdout);
+
+    clock_t begin = clock();
+
+    quick_sort(quick_arr,0,n-1);
+
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    time_spent*=1000;       ///second to mili-second
+
+    printf("%d, %.0lf\n",n,time_spent);
+
+}
+
+void reverse_arr(int bubble_arr[], int insertion_arr[],int merge_arr[], int quick_arr[])
 {
     int i = 0,j = n - 1;
     while(j >= 0){
@@ -152,17 +199,19 @@ void reverse_arr(int bubble_arr[], int insertion_arr[],int merge_arr[])
         i++;
         j--;
     }
-    for(i=0;i<n;i++) insertion_arr[i] = merge_arr[i] = bubble_arr[i];
+    for(i=0;i<n;i++) insertion_arr[i] = merge_arr[i] = quick_arr[i] = bubble_arr[i];
 }
 
-void start_all_func(int bubble_arr[], int insertion_arr[],int merge_arr[])
+
+void start_all_func(int bubble_arr[], int insertion_arr[],int merge_arr[], int quick_arr[])
 {
     if(test_case[0]=='W')
-        reverse_arr(bubble_arr,insertion_arr,merge_arr);
+        reverse_arr(bubble_arr,insertion_arr,merge_arr,quick_arr);
 
     primary_merge_func(merge_arr);
     bubble_sort(bubble_arr);
     insertion_sort(insertion_arr);
+    primary_quick_func(quick_arr);
 }
 
 int main()
@@ -171,14 +220,14 @@ int main()
 
     for(int i=1;i<=100;i++){
         n=i*5000;
-        int bubble_arr[n],insertion_arr[n],merge_arr[n];
-        get_arr(bubble_arr,insertion_arr,merge_arr);
+        int bubble_arr[n],insertion_arr[n],merge_arr[n],quick_arr[n];
+        get_arr(bubble_arr,insertion_arr,merge_arr,quick_arr);
 
         char cases[][10] = {"Average","Best","Worst"};
 
         for(int j=0;j<3;j++){
             strncpy(test_case, cases[j], 10);
-            start_all_func(bubble_arr,insertion_arr,merge_arr);
+            start_all_func(bubble_arr,insertion_arr,merge_arr,quick_arr);
         }
     }
 
